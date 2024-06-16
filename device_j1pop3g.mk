@@ -19,7 +19,7 @@ $(call inherit-product, $(LOCAL_PATH)/device.mk)
 
 # Keylayouts
 KEYLAYOUT_FILES := \
-	$(LOCAL_PATH)/keylayouts/ist30xx_ts_input.kl
+	$(LOCAL_PATH)/keylayouts/sci-keypad.kl
 
 PRODUCT_COPY_FILES += \
 	$(foreach f,$(KEYLAYOUT_FILES),$(f):system/usr/keylayout/$(notdir $(f)))

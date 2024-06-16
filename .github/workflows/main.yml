@@ -35,7 +35,7 @@ jobs:
         python3 ~/.bin/repo init --depth=1 -u https://github.com/CyanogenMod/android -b cm-12.1
         git clone https://github.com/J110H-Android/android_device_samsung_j1pop3g -b cm-12.1 ~/TWRP/device/samsung/j1pop3g
         git clone https://github.com/J110H-Android/android_vendor_samsung_j1pop3g-2 -b cm-12.1 ~/TWRP/vendor/samsung/j1pop3g
-        git clone https://github.com/J110H-Android/android_kernel_samsung_j1pop3g -b cm-12.1 ~/TWRP/kernel/samsung/j1pop3g
+        git clone https://github.com/J110H-Android/android_kernel_samsung_j1pop3g -b master ~/TWRP/kernel/samsung/j1pop3g
         python3 ~/.bin/repo sync -c --force-sync --optimized-fetch --no-tags --no-clone-bundle --prune -j$(nproc --all)
     - name: Building CyanogenMod
       run: |

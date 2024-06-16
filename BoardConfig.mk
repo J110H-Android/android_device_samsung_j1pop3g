@@ -51,28 +51,11 @@ TARGET_KERNEL_SOURCE := kernel/samsung/j1pop3g
 BOARD_MKBOOTIMG_ARGS := --kernel_offset 0x00008000 --ramdisk_offset 0x01000000 --tags_offset 0x00000100 --dt device/samsung/j1pop3g/dt.img
 NEED_KERNEL_MODULE_ROOT := true
 
-SPRD_MODULES:
-	make -C vendor/sprd/modules/libgpu/gpu/utgard/ MALI_PLATFORM=sc8830 BUILD=debug KDIR=$(KERNEL_OUT) clean
-	make -C vendor/sprd/modules/libgpu/gpu/utgard/ MALI_PLATFORM=sc8830 BUILD=debug KDIR=$(KERNEL_OUT)
-	mv vendor/sprd/modules/libgpu/gpu/utgard/mali.ko $(KERNEL_MODULES_OUT)
-	make -C vendor/sprd/wcn/wifi/sc2331/5.1/ SPRDWL_PLATFORM=sc8830 USING_PP_CORE=2 BUILD=debug KDIR=$(KERNEL_OUT) clean
-	make -C vendor/sprd/wcn/wifi/sc2331/5.1/ SPRDWL_PLATFORM=sc8830 USING_PP_CORE=2 BUILD=debug KDIR=$(KERNEL_OUT)
-	mv vendor/sprd/wcn/wifi/sc2331/5.1/sprdwl.ko $(KERNEL_MODULES_OUT)
-	mkdir -p $(PRODUCT_OUT)/system/lib/modules
-	ln -sf /lib/modules/autotst.ko $(PRODUCT_OUT)/system/lib/modules/autotst.ko
-	ln -sf /lib/modules/mali.ko $(PRODUCT_OUT)/system/lib/modules/mali.ko
-	ln -sf /lib/modules/mmc_test.ko $(PRODUCT_OUT)/system/lib/modules/mmc_test.ko
-	ln -sf /lib/modules/sprdwl.ko $(PRODUCT_OUT)/system/lib/modules/sprdwl.ko
-
-TARGET_KERNEL_MODULES := SPRD_MODULES
-
 # RIL
 BOARD_RIL_CLASS := ../../../device/samsung/j1pop3g/ril
 
 # Bluetooth
 BOARD_HAVE_BLUETOOTH := true
-SPRD_WCNBT_CHISET := marlin
-BOARD_SPRD_WCNBT_MARLIN := true
 BOARD_BLUETOOTH_BDROID_BUILDCFG_INCLUDE_DIR := device/samsung/j1pop3g/bluetooth
 
 # Wifi
@@ -81,7 +64,7 @@ WPA_SUPPLICANT_VERSION := VER_2_1_DEVEL
 BOARD_WPA_SUPPLICANT_PRIVATE_LIB := lib_driver_cmd_sprdwl
 BOARD_HOSTAPD_DRIVER := NL80211
 BOARD_HOSTAPD_PRIVATE_LIB := lib_driver_cmd_sprdwl
-BOARD_WLAN_DEVICE := sc2341
+BOARD_WLAN_DEVICE := sc2331
 WIFI_DRIVER_FW_PATH_PARAM := "/data/misc/wifi/fwpath"
 WIFI_DRIVER_FW_PATH_STA := "sta_mode"
 WIFI_DRIVER_FW_PATH_P2P := "p2p_mode"

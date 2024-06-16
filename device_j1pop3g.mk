@@ -12,26 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-LOCAL_PATH := device/samsung/core33g
+LOCAL_PATH := device/samsung/j1pop3g
 
 $(call inherit-product, $(SRC_TARGET_DIR)/product/full_base_telephony.mk)
 $(call inherit-product, $(LOCAL_PATH)/device.mk)
 
 # Keylayouts
 KEYLAYOUT_FILES := \
-	$(LOCAL_PATH)/keylayouts/sci-keypad.kl \
-	$(LOCAL_PATH)/keylayouts/samsung-keypad.kl \
 	$(LOCAL_PATH)/keylayouts/ist30xx_ts_input.kl
 
 PRODUCT_COPY_FILES += \
 	$(foreach f,$(KEYLAYOUT_FILES),$(f):system/usr/keylayout/$(notdir $(f)))
-
-# Bluetooth config
-BLUETOOTH_CONFIGS := \
-	$(LOCAL_PATH)/configs/bluetooth/bt_vendor.conf
-
-PRODUCT_COPY_FILES += \
-	$(foreach f,$(BLUETOOTH_CONFIGS),$(f):system/etc/bluetooth/$(notdir $(f)))
 
 # Media config
 MEDIA_CONFIGS := \
@@ -94,12 +85,13 @@ PRODUCT_PACKAGES += \
 
 # Wifi
 PRODUCT_PACKAGES += \
-	libnetcmdiface \
+	libwpa_client \
 	dhcpcd.conf \
 	wpa_supplicant \
 	hostapd
 
 WIFI_CONFIGS := \
+	$(LOCAL_PATH)/configs/wifi/mcs.ini \
 	$(LOCAL_PATH)/configs/wifi/wpa_supplicant.conf \
 	$(LOCAL_PATH)/configs/wifi/wpa_supplicant_overlay.conf \
 	$(LOCAL_PATH)/configs/wifi/p2p_supplicant_overlay.conf
@@ -168,8 +160,8 @@ PRODUCT_PACKAGES += \
 $(call inherit-product, $(SRC_TARGET_DIR)/product/full_base_telephony.mk)
 
 # Set those variables here to overwrite the inherited values.
-PRODUCT_NAME := full_core33g
-PRODUCT_DEVICE := core33g
+PRODUCT_NAME := full_j1pop3g
+PRODUCT_DEVICE := j1pop3g
 PRODUCT_BRAND := samsung
 PRODUCT_MANUFACTURER := samsung
-PRODUCT_MODEL := SM-G360H
+PRODUCT_MODEL := SM-J110H

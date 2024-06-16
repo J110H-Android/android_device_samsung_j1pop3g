@@ -9,15 +9,52 @@ on init
 
     # Support Preload install apks
     mkdir /preload 0771 system system
-	
+
+    # See storage config details at http://source.android.com/tech/storage/
+    mkdir /mnt/media_rw/extSdCard 0700 media_rw media_rw
+    mkdir /mnt/media_rw/UsbDriveA 0700 media_rw media_rw
+    mkdir /mnt/media_rw/UsbDriveB 0700 media_rw media_rw
+    mkdir /mnt/media_rw/UsbDriveC 0700 media_rw media_rw
+    mkdir /mnt/media_rw/UsbDriveD 0700 media_rw media_rw
+    mkdir /mnt/media_rw/UsbDriveE 0700 media_rw media_rw
+    mkdir /mnt/media_rw/UsbDriveF 0700 media_rw media_rw
+    	
     #thermistor
     chown radio system /sys/class/sec/sec-thermistor/temp_adc
     chown radio system /sys/class/sec/sec-thermistor/temperature
     chown radio system /sys/class/sec/sec-thermistor/dcxo_temp_adc
     chown radio system /sys/class/sec/sec-thermistor/dcxo_temperature
-
-	chown radio system /sys/class/thermal/thermal_zone1/temp
 	
+	chown radio system /sys/class/thermal/thermal_zone1/temp
+
+    export EXTERNAL_STORAGE /storage/emulated/legacy
+    export EMULATED_STORAGE_SOURCE /mnt/shell/emulated
+    export EMULATED_STORAGE_TARGET /storage/emulated
+
+    # Support legacy paths
+    symlink /storage/emulated/legacy /sdcard
+    symlink /storage/emulated/legacy /mnt/sdcard
+    symlink /storage/emulated/legacy /storage/sdcard0
+    symlink /mnt/shell/emulated/0 /storage/emulated/legacy
+
+    # map "real" external storages paths also in same way. backwards compatibility.
+    symlink /storage/extSdCard /mnt/extSdCard
+    symlink /storage/UsbDriveA /mnt/UsbDriveA
+    symlink /storage/UsbDriveB /mnt/UsbDriveB
+    symlink /storage/UsbDriveC /mnt/UsbDriveC
+    symlink /storage/UsbDriveD /mnt/UsbDriveD
+    symlink /storage/UsbDriveE /mnt/UsbDriveE
+    symlink /storage/UsbDriveF /mnt/UsbDriveF
+
+    export SECONDARY_STORAGE /storage/extSdCard
+    
+    mkdir /storage/extSdCard 0700 root root
+    mkdir /storage/UsbDriveA 0700 root root
+    mkdir /storage/UsbDriveB 0700 root root
+    mkdir /storage/UsbDriveC 0700 root root
+    mkdir /storage/UsbDriveD 0700 root root
+    mkdir /storage/UsbDriveE 0700 root root
+    mkdir /storage/UsbDriveF 0700 root root
     mkdir /cache 0000 system system
     mkdir /efs 0774 system radio
 
@@ -25,11 +62,6 @@ on init
     setprop ro.SecEDS.enable false
 
 on boot
-# Turn on all CPUs
-    write /sys/devices/system/cpu/cpu1/online 1
-    write /sys/devices/system/cpu/cpu2/online 1
-    write /sys/devices/system/cpu/cpu3/online 1
-
     chown shell shell /sys/devices/platform/bcm_hsotgctrl_phy_mdio/USB_MDIO0
     chown shell shell /sys/devices/platform/bcm_hsotgctrl_phy_mdio/USB_MDIO1
     chown shell shell /sys/devices/platform/bcm_hsotgctrl_phy_mdio/USB_MDIO2
@@ -52,6 +84,7 @@ on boot
     chown system radio /sys/class/sensors/proximity_sensor/state
     chown system radio /sys/class/sensors/proximity_sensor/raw_data
     chown system radio /sys/class/sensors/proximity_sensor/prox_avg
+    chown system radio /sys/class/sensors/proximity_sensor/prox_trim
     chown system radio /sys/class/sensors/proximity_sensor/prox_cal
     chown system radio /sys/class/sensors/proximity_sensor/vendor
     chown system radio /sys/class/sensors/proximity_sensor/name
@@ -71,27 +104,11 @@ on boot
     chown system radio /sys/class/sensors/gyro_sensor/selftest_dps
     chown system radio /sys/class/sensors/gyro_sensor/vendor
     chown system radio /sys/class/sensors/gyro_sensor/name
-# Barometer_sensor
-    chown system radio /sys/class/sensors/barometer_sensor/sea_level_pressure
-    chown system radio /sys/class/sensors/barometer_sensor/vendor
-    chown system radio /sys/class/sensors/barometer_sensor/name
-    chown system radio /sys/class/sensors/barometer_sensor/calibration
 # Magnetic_sensor
     chown system radio /dev/akm8963
     chown system radio /sys/class/sensors/magnetic_sensor/raw_data
     chown system radio /sys/class/sensors/magnetic_sensor/vendor
     chown system radio /sys/class/sensors/magnetic_sensor/name
-# Gesture_sensor
-    chown system radio /sys/class/sensors/gesture_sensor/vendor
-    chown system radio /sys/class/sensors/gesture_sensor/name
-    chown system radio /sys/class/sensors/gesture_sensor/raw_data
-    chown system radio /sys/class/sensors/gesture_sensor/ir_current
-    chown system radio /sys/class/sensors/gesture_sensor/selftest
-# Temphumidity_sensor
-    chown system radio /sys/class/sensors/temphumidity_sensor/vendor
-    chown system radio /sys/class/sensors/temphumidity_sensor/name
-    chown system radio /sys/class/sensors/temphumidity_sensor/engine_ver
-    chown system radio /sys/class/sensors/temphumidity_sensor/send_accuracy
 # Grip_sensor
     chown system radio /sys/class/sensors/grip_sensor/vendor
     chown system radio /sys/class/sensors/grip_sensor/name
@@ -166,6 +183,7 @@ on boot
     setprop ro.build.product hawaii
     setprop ro.product.device hawaii
     setprop ro.radio.noril no
+    setprop ro.digital.fm.support 1
 
     chmod 0660 /dev/bcm_atc
     chown shell system /dev/bcm_atc
@@ -193,6 +211,10 @@ on boot
    chown system radio /sys/class/power_supply/battery/siop_level
    chown system radio /sys/class/power_supply/battery/wc_enable
    chown system radio /sys/class/power_supply/battery/update
+   chown system radio /sys/class/power_supply/otg/online
+   chmod 0664 /sys/class/power_supply/otg/online
+   chown system radio /sys/class/power_supply/battery/charge_otg_control
+   chmod 0664 /sys/class/power_supply/battery/charge_otg_control
    chown sdcard_rw sdcard_rw /sys/class/power_supply/battery/call
    chown sdcard_rw sdcard_rw /sys/class/power_supply/battery/video
    chown sdcard_rw sdcard_rw /sys/class/power_supply/battery/music
@@ -215,10 +237,16 @@ on boot
     setprop status.battery.level_scale 10
 
 
+# OTG Test
+   chown system radio /sys/class/host_notify/usb_otg/booster
+   chmod 0664 /sys/class/host_notify/usb_otg/booster
+
 # phone
     setprop ro.telephony.call_ring.multiple 0
+
 # flash
     chown system radio /sys/class/camera/rear/rear_flash
+
 #security driver
     chmod 0660 /dev/bcm_security
     chown radio root /dev/bcm_security
@@ -280,15 +308,19 @@ on fs
      chown radio system /efs
      chmod 0771 /efs
 
-# Broadcom GPS
-    chown system system /dev/ttyS3
-	chmod 0660 /dev/ttyS3
-	chown system system /sys/class/sec/gps/GPS_PWR_EN/value
-	chmod 0664 /sys/class/sec/gps/GPS_PWR_EN/value
-	mkdir /data/system 0771 system system
-	chown system system /data/system
-	mkdir /data/system/gps 0771 system system
-	chown system system /data/system/gps
+# GPS
+    chown root system /dev/ttyS3
+    chmod 0660 /dev/ttyS3
+    chown root system /sys/class/sec/gps/GPS_PWR_EN/value
+    chmod 0664 /sys/class/sec/gps/GPS_PWR_EN/value
+
+# make sure data_system dir and perms are properly set.
+    mkdir /data/system 0771 system system
+    chown system system /data/system
+    mkdir /data/system/gps 0771 system system
+    chown system system /data/system/gps
+
+# delete gps Factory file
 	rm /data/gps_started
 	rm /data/glonass_started
 	rm /data/beidou_started
@@ -306,18 +338,17 @@ on fs
 # permissions for cpuhotplug
     chown radio system /sys/devices/system/cpu/cpuhotplug/cpu_num_min_limit
     chown radio system /sys/devices/system/cpu/cpuhotplug/cpu_num_limit
+	chown radio system /sys/devices/system/cpu/cpuhotplug/cpu_hotplug_disable
     chmod 0660 /sys/devices/system/cpu/cpuhotplug/cpu_num_min_limit
     chmod 0660 /sys/devices/system/cpu/cpuhotplug/cpu_num_limit
+	chmod 0660 /sys/devices/system/cpu/cpuhotplug/cpu_hotplug_disable
 
 # permissions for cpuonline
     chown radio system /sys/devices/system/cpu/cpu0/online
     chown radio system /sys/devices/system/cpu/cpu1/online
-    chown radio system /sys/devices/system/cpu/cpu2/online
-    chown radio system /sys/devices/system/cpu/cpu3/online
-    chmod 0660 /sys/devices/system/cpu/cpu0/online
+	chmod 0660 /sys/devices/system/cpu/cpu0/online
     chmod 0660 /sys/devices/system/cpu/cpu1/online
-    chmod 0660 /sys/devices/system/cpu/cpu2/online
-    chmod 0660 /sys/devices/system/cpu/cpu3/online
+
 
 # permissions for bluetooth.
    setprop ro.bt.bdaddr_path "/efs/bluetooth/bt_addr"
@@ -339,6 +370,23 @@ on fs
     chown bluetooth bluetooth /sys/class/rfkill/rfkill0/state
     chown bluetooth bluetooth /sys/class/rfkill/rfkill0/type
     chmod 0777 /system/bin/btld
+   chmod 0660 proc/bluetooth/sleep/btwrite
+   chown bluetooth system proc/bluetooth/sleep/btwrite
+   chmod 777 /data
+
+#For Absolute Persistence Partition
+
+    mkdir /persdata 0755 system system
+    mkdir /persdata/absolute 0750 system system
+
+    wait /dev/block/platform/sprd-sdhci.3/by-name/PERSDATA
+    check_fs /dev/block/platform/sprd-sdhci.3/by-name/PERSDATA ext4
+    mount ext4 /dev/block/platform/sprd-sdhci.3/by-name/PERSDATA /persdata/absolute nosuid nodev barrier=1
+
+    chown system system /persdata
+    chmod 0755 /persdata
+    chown system system /persdata/absolute
+    chmod 0750 /persdata/absolute
 
 # permissions for NFC
 #    setprop ro.nfc.port "I2C"
@@ -354,14 +402,25 @@ on fs
 #    chmod 666 /data/bcmnfc/libnfc-brcm-20791b03.conf
 
 #LCD
-    chown system system /sys/class/backlight/panel/brightness
-    chmod 0664 system /sys/class/backlight/panel/brightness
+	chown system system /sys/class/backlight/panel/brightness
+	chmod 0664 system /sys/class/backlight/panel/brightness
+	chown radio system /sys/class/lcd/panel/power_reduce
+	chown system system /sys/class/backlight/panel/auto_brightness
+	chmod 0664 /sys/class/backlight/panel/auto_brightness
+	chown radio system /sys/class/lcd/panel/temperature
+	chmod 0664 /sys/class/lcd/panel/temperature
 
-#mdnie
-    chown system media_rw /sys/class/mdnie/mdnie/scenario
-    chmod 0664 /sys/class/mdnie/mdnie/scenario
-    chown system system /sys/class/mdnie/mdnie/negative
-    chmod 0664 /sys/class/mdnie/mdnie/negative
+#KEY
+	chown system system /sys/class/sec/sec_key/reset_enabled
+	chmod 0664 system /sys/class/sec/sec_key/reset_enabled
+
+#touchkey
+	chown system system /sys/class/sec/sec_touchkey/touchkey_back
+	chown system system /sys/class/sec/sec_touchkey/touchkey_recent
+	chown system system /sys/class/sec/sec_touchkey/touchkey_threshold
+	chown system system /sys/class/sec/sec_touchkey/touchkey_raw_recent
+	chown system system /sys/class/sec/sec_touchkey/touchkey_raw_back
+	chown system system /sys/class/sec/sec_touchkey/touchkey_firm_update
 
 #Enable PMTUD tcp_mtu_probing
  write /proc/sys/net/ipv4/tcp_mtu_probing 1
@@ -438,15 +497,45 @@ service watchdogd /system/bin/watchdogd
     oneshot
 
 # virtual sdcard daemon running as media_rw (1023)
-service sdcard /system/bin/sdcard -u 1023 -g 1023 -l /data/media /mnt/shell/emulated
+service sdcard /system/bin/sdcard -u 1023 -g 1023 -l -r /data/media /mnt/shell/emulated
     class late_start
     oneshot
 
-service fuse_extSdCard /system/bin/sdcard -u 1023 -g 1023 -w 1023 -d /mnt/media_rw/extSdCard /storage/extSdCard
+service fuse_extSdCard /system/bin/sdcard -u 1023 -g 1023 -w 1023 -d -f /mnt/media_rw/extSdCard /storage/extSdCard
     class late_start
     disabled
     oneshot
 
+service fuse_UsbDriveA /system/bin/sdcard -u 1023 -g 1023 -d -f /mnt/media_rw/UsbDriveA /storage/UsbDriveA
+    class late_start
+    disabled
+    oneshot
+
+service fuse_UsbDriveB /system/bin/sdcard -u 1023 -g 1023 -d -f /mnt/media_rw/UsbDriveB /storage/UsbDriveB
+    class late_start
+    disabled
+    oneshot
+
+service fuse_UsbDriveC /system/bin/sdcard -u 1023 -g 1023 -d -f /mnt/media_rw/UsbDriveC /storage/UsbDriveC
+    class late_start
+    disabled
+    oneshot
+
+service fuse_UsbDriveD /system/bin/sdcard -u 1023 -g 1023 -d -f /mnt/media_rw/UsbDriveD /storage/UsbDriveD
+    class late_start
+    disabled
+    oneshot
+
+service fuse_UsbDriveE /system/bin/sdcard -u 1023 -g 1023 -d -f /mnt/media_rw/UsbDriveE /storage/UsbDriveE
+    class late_start
+    disabled
+    oneshot
+
+service fuse_UsbDriveF /system/bin/sdcard -u 1023 -g 1023 -d -f /mnt/media_rw/UsbDriveF /storage/UsbDriveF
+    class late_start
+    disabled
+    oneshot
+    
 # This will make sure that sdcard service starts as late_start.
 on nonencrypted
     setprop ro.fuse_sdcard ${persist.fuse_sdcard}
@@ -455,7 +544,7 @@ on property:vold.decrypt=trigger_restart_framework
     setprop ro.fuse_sdcard ${persist.fuse_sdcard}
 
 # Runtime Compcache
-service rtccd /system/bin/rtccd3 -a 300m -x 0.5
+service rtccd /system/bin/rtccd3 -a 150m -x 0.5
     class core
     user root
     oneshot
@@ -481,13 +570,23 @@ on property:dev.bootcomplete=1
     write /sys/class/input/input1/enable 1
     start copy_cp_imgs
 
+#Interactive governor parameters tuning for better power and performance
+    write /sys/devices/system/cpu/cpufreq/interactive/above_hispeed_delay 6000
+    write /sys/devices/system/cpu/cpufreq/interactive/go_hispeed_load 70
+    # write /sys/devices/system/cpu/cpufreq/interactive/hispeed_freq 1300000
+    write /sys/devices/system/cpu/cpufreq/interactive/io_is_busy 1
+    write /sys/devices/system/cpu/cpufreq/interactive/target_loads 70
+    write /sys/devices/system/cpu/cpufreq/interactive/min_sample_time 80000
+    write /sys/devices/system/cpu/cpufreq/interactive/timer_rate 50000
+    write /sys/devices/system/cpu/cpufreq/interactive/timer_slack 80000
+
 # umount service
 service umount_service /system/bin/umount /preload
     disabled
     oneshot
 
 on property:persist.sys.storage_preload=1
-    mount ext4 /dev/block/mmcblk0p19 /preload nosuid nodev noatime wait ro
+    mount ext4 /dev/block/platform/sprd-sdhci.3/by-name/HIDDEN /preload nosuid nodev noatime wait ro
     setprop storage.preload.complete 1
 
 on property:persist.sys.storage_preload=0

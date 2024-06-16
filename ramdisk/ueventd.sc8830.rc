@@ -34,6 +34,8 @@
 /dev/spipe_w5           0660     system      system
 /dev/spipe_w6           0660     media       audio
 /dev/spipe_w8           0660     system      system
+/dev/spipe_w9           0660     system      system
+/dev/spipe_w10           0660     system      system
 /dev/slog_wcn           0660     system      system
 /dev/spipe_wcn*         0660     system      system
 /dev/vbpipe1            0660     system  system
@@ -82,4 +84,7 @@
 /dev/sdiomux30          0660     media       audio
 /dev/akm8963_dev        0660     system      system
 /dev/umts_router        0660     system      radio
-
+/dev/download		0660     system      system
+/dev/power_ctl		0660     system      system
+# for PL2303 driver
+/dev/ttyUSB*            0660     system      usb

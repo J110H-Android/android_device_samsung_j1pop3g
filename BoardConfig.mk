@@ -167,6 +167,7 @@ TW_HAS_DOWNLOAD_MODE := true
 DEVICE_RESOLUTION := 480x800
 TW_THEME := portrait_mdpi
 BOARD_USE_CUSTOM_RECOVERY_FONT := \"roboto_10x18.h\"
+TW_USE_TOOLBOX := true
 
 # UMS
 BOARD_UMS_LUNFILE := "/sys/devices/virtual/android_usb/android0/f_mass_storage/lun/file"
